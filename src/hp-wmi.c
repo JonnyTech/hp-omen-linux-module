@@ -1173,7 +1173,7 @@ add_sysfs_error:
   return err;
 }
 
-static int __exit hp_wmi_bios_remove(struct platform_device *device)
+static void __exit hp_wmi_bios_remove(struct platform_device *device)
 {
   int i;
   cleanup_sysfs(device);
@@ -1196,7 +1196,7 @@ static int __exit hp_wmi_bios_remove(struct platform_device *device)
     rfkill_destroy(wwan_rfkill);
   }
 
-  return 0;
+  // return 0;
 }
 
 static int hp_wmi_resume_handler(struct device *device)
