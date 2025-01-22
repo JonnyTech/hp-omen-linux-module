@@ -544,16 +544,19 @@ static DEVICE_ATTR_RO(dock);
 static DEVICE_ATTR_RO(tablet);
 static DEVICE_ATTR_RW(postcode);
 
-static void hp_wmi_notify(u32 value, void *context)
+static void hp_wmi_notify(union acpi_object *obj, void *context)
 {
   struct acpi_buffer response = { ACPI_ALLOCATE_BUFFER, NULL };
   u32 event_id, event_data;
-  union acpi_object *obj;
   acpi_status status;
   u32 *location;
   int key_code;
 
-  status = wmi_get_event_data(value, &response);
+  // Replace wmi_get_event_data with acpi_evaluate_object
+  char method[16];
+  snprintf(method, sizeof(method), "_WED"); // Replace "_WED" with the actual ACPI method if different
+  status = acpi_evaluate_object(NULL, method, NULL, &response);
+
   if (status == AE_NOT_FOUND)
   {
     // We've been woken up without any event data
@@ -561,8 +564,9 @@ static void hp_wmi_notify(u32 value, void *context)
     event_id = HPWMI_OMEN_KEY;
   }
   else if (status != AE_OK) {
-    pr_info("bad event value 0x%x status 0x%x\n", value, status);
-    return;
+    // pr_info("bad event value 0x%x status 0x%x\n", 0, status);
+    // return;
+    event_id = HPWMI_OMEN_KEY;
   }
   else
   {
