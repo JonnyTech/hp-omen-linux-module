@@ -544,6 +544,8 @@ static DEVICE_ATTR_RO(dock);
 static DEVICE_ATTR_RO(tablet);
 static DEVICE_ATTR_RW(postcode);
 
+#define AE_KEY_OMEN EXCEP_ENV (0x1001)
+
 static void hp_wmi_notify(union acpi_object *obj, void *context)
 {
   struct acpi_buffer response = { ACPI_ALLOCATE_BUFFER, NULL };
@@ -563,10 +565,12 @@ static void hp_wmi_notify(union acpi_object *obj, void *context)
     // Some models do this when the Omen hotkey is pressed
     event_id = HPWMI_OMEN_KEY;
   }
-  else if (status != AE_OK) {
-    // pr_info("bad event value 0x%x status 0x%x\n", 0, status);
-    // return;
+  else if (status == AE_KEY_OMEN) {
     event_id = HPWMI_OMEN_KEY;
+  }
+  else if (status != AE_OK) {
+    pr_info("bad event value 0x%x status 0x%x\n", 0, status);
+    return;
   }
   else
   {
